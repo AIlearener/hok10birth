@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>头像与头像框合成工具</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    
+    <!-- 配置Tailwind自定义颜色和字体 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3B82F6',
+                        secondary: '#10B981',
+                        neutral: '#1F2937',
+                    },
+                    fontFamily: {
+                        inter: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .avatar-shadow {
+                box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            }
+            .transition-transform-opacity {
+                transition-property: transform, opacity;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen font-inter text-neutral">
+    <div class="container mx-auto px-4 py-8 max-w-4xl">
+        <!-- 页面标题 -->
+        <header class="text-center mb-12">
+            <h1 class="text-[clamp(2rem,5vw,3rem)] font-bold text-neutral mb-3 tracking-tight">
+                王者十周年头像框合成
+            </h1>
+            <p class="text-gray-600 max-w-2xl mx-auto">
+                上传您的个人头像，系统将自动与提供的头像框合成，生成带框的王者十周年头像
+            </p>
+        </header>
+        
+        <!-- 主要内容区 -->
+        <main class="grid md:grid-cols-2 gap-8 items-center">
+            <!-- 左侧：上传区域 -->
+            <div class="bg-white rounded-2xl p-6 shadow-lg transform transition-all duration-300 hover:shadow-xl">
+                <h2 class="text-xl font-semibold mb-4 flex items-center">
+                    <i class="fa fa-upload text-primary mr-2"></i>上传您的头像
+                </h2>
+                
+                <!-- 上传区域 -->
+                <div id="upload-area" class="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center cursor-pointer transition-all duration-300 hover:border-primary hover:bg-blue-50">
+                    <input type="file" id="avatar-upload" accept="image/*" class="hidden">
+                    <i class="fa fa-user-circle-o text-5xl text-gray-400 mb-3"></i>
+                    <p class="text-gray-600 mb-2">点击或拖拽图片到此处上传</p>
+                    <p class="text-gray-400 text-sm">支持JPG、PNG等格式</p>
+                </div>
+                
+                <!-- 预览上传的头像 -->
+                <div id="preview-container" class="mt-6 hidden">
+                    <h3 class="text-sm font-medium text-gray-700 mb-2">您的原始头像：</h3>
+                    <div class="relative rounded-xl overflow-hidden avatar-shadow">
+                        <img id="original-avatar" class="w-full h-auto object-cover" alt="用户上传的原始头像">
+                        <button id="change-avatar" class="absolute bottom-2 right-2 bg-white/80 hover:bg-white text-primary p-2 rounded-full transition-all duration-300">
+                            <i class="fa fa-refresh"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 操作按钮 -->
+                <div class="mt-6 flex justify-center">
+                    <button id="combine-btn" class="bg-primary hover:bg-primary/90 text-white font-medium py-2 px-6 rounded-lg shadow transition-all duration-300 flex items-center opacity-50 cursor-not-allowed" disabled>
+                        <i class="fa fa-magic mr-2"></i>合成头像
+                    </button>
+                </div>
+            </div>
+            
+            <!-- 右侧：结果展示 -->
+            <div class="bg-white rounded-2xl p-6 shadow-lg transform transition-all duration-300 hover:shadow-xl">
+                <h2 class="text-xl font-semibold mb-4 flex items-center">
+                    <i class="fa fa-image text-secondary mr-2"></i>合成结果
+                </h2>
+                
+                <!-- 结果预览区 -->
+                <div id="result-container" class="relative rounded-xl overflow-hidden bg-gray-100 avatar-shadow aspect-square flex items-center justify-center">
+                    <div id="empty-result" class="text-center p-8">
+                        <i class="fa fa-picture-o text-5xl text-gray-300 mb-3"></i>
+                        <p class="text-gray-500">上传头像并点击合成按钮查看结果</p>
+                    </div>
+                    
+                    <!-- 合成后的图像将显示在这里 -->
+                    <canvas id="combined-avatar" class="absolute inset-0 w-full h-full object-cover hidden"></canvas>
+                </div>
+                
+                <!-- 下载按钮 -->
+                <div id="download-section" class="mt-6 flex justify-center hidden">
+                    <button id="download-btn" class="bg-secondary hover:bg-secondary/90 text-white font-medium py-2 px-6 rounded-lg shadow transition-all duration-300 flex items-center">
+                        <i class="fa fa-download mr-2"></i>下载头像
+                    </button>
+                </div>
+            </div>
+        </main>
+        
+        <!-- 说明区域 -->
+        <section class="mt-12 bg-white rounded-2xl p-6 shadow-md">
+            <h3 class="text-lg font-semibold mb-3 flex items-center">
+                <i class="fa fa-info-circle text-primary mr-2"></i>使用说明
+            </h3>
+            <ul class="list-disc pl-5 text-gray-600 space-y-2">
+                <li>上传正方形头像可获得最佳效果</li>
+                <li>系统会自动将头像框覆盖在您的头像上</li>
+                <li>合成完成后，您可以下载最终的头像图片</li>
+                <li>支持常见的图片格式（JPG、PNG等）</li>
+            </ul>
+        </section>
+        
+        <!-- 页脚 -->
+        <footer class="mt-12 text-center text-gray-500 text-sm">
+            <p>王者十周年头像合成工具 &copy; 2025</p>
+        </footer>
+    </div>
+
+    <script>
+        // 获取DOM元素
+        const uploadArea = document.getElementById('upload-area');
+        const avatarUpload = document.getElementById('avatar-upload');
+        const originalAvatar = document.getElementById('original-avatar');
+        const previewContainer = document.getElementById('preview-container');
+        const combineBtn = document.getElementById('combine-btn');
+        const changeAvatar = document.getElementById('change-avatar');
+        const resultContainer = document.getElementById('result-container');
+        const emptyResult = document.getElementById('empty-result');
+        const combinedAvatar = document.getElementById('combined-avatar');
+        const downloadSection = document.getElementById('download-section');
+        const downloadBtn = document.getElementById('download-btn');
+        
+        // 头像框图片URL（用户提供的图片）
+        const frameImageUrl = 'https://p3-flow-imagex-download-sign.byteimg.com/tos-cn-i-a9rns2rl98/ccb06b9d888249cea7bd24395f3d3883.png~tplv-a9rns2rl98-24:720:720.png?rcl=20250924223819A6F3341E744B492E3260&rk3s=8e244e95&rrcfp=8a172a1a&x-expires=1759329499&x-signature=%2BpQ%2FP6uQPTJ2tzOmE%2FBbJOhQg0I%3D';
+        
+        // 上传区域点击触发文件选择
+        uploadArea.addEventListener('click', () => {
+            avatarUpload.click();
+        });
+        
+        // 更换头像按钮
+        changeAvatar.addEventListener('click', (e) => {
+            e.stopPropagation();
+            avatarUpload.click();
+        });
+        
+        // 拖拽功能
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('border-primary', 'bg-blue-50');
+        });
+        
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('border-primary', 'bg-blue-50');
+        });
+        
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('border-primary', 'bg-blue-50');
+            
+            if (e.dataTransfer.files.length) {
+                handleFile(e.dataTransfer.files[0]);
+            }
+        });
+        
+        // 处理文件上传
+        avatarUpload.addEventListener('change', (e) => {
+            if (e.target.files.length) {
+                handleFile(e.target.files[0]);
+            }
+        });
+        
+        // 处理上传的文件
+        function handleFile(file) {
+            // 检查文件类型
+            if (!file.type.startsWith('image/')) {
+                alert('请上传图片文件');
+                return;
+            }
+            
+            // 读取文件并显示预览
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                originalAvatar.src = e.target.result;
+                previewContainer.classList.remove('hidden');
+                
+                // 启用合成按钮
+                combineBtn.disabled = false;
+                combineBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                
+                // 添加淡入动画
+                originalAvatar.style.opacity = '0';
+                originalAvatar.style.transform = 'scale(0.95)';
+                originalAvatar.onload = () => {
+                    originalAvatar.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                    originalAvatar.style.opacity = '1';
+                    originalAvatar.style.transform = 'scale(1)';
+                };
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        // 合成头像
+        combineBtn.addEventListener('click', combineAvatars);
+        
+        // 合成头像函数
+        function combineAvatars() {
+            // 创建图像对象
+            const userAvatar = new Image();
+            const frameImage = new Image();
+            
+            // 解决跨域问题
+            userAvatar.crossOrigin = 'anonymous';
+            frameImage.crossOrigin = 'anonymous';
+            
+            userAvatar.src = originalAvatar.src;
+            
+            // 加载头像框图片
+            frameImage.onload = () => {
+                // 设置canvas尺寸
+                const canvasWidth = userAvatar.width;
+                const canvasHeight = userAvatar.height;
+                
+                combinedAvatar.width = canvasWidth;
+                combinedAvatar.height = canvasHeight;
+                
+                // 获取2D上下文
+                const ctx = combinedAvatar.getContext('2d');
+                
+                // 清除画布
+                ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+                
+                // 绘制用户头像
+                ctx.drawImage(userAvatar, 0, 0, canvasWidth, canvasHeight);
+                
+                // 绘制头像框（完全覆盖）
+                ctx.drawImage(frameImage, 0, 0, canvasWidth, canvasHeight);
+                
+                // 显示结果
+                emptyResult.classList.add('hidden');
+                combinedAvatar.classList.remove('hidden');
+                downloadSection.classList.remove('hidden');
+                
+                // 添加出现动画
+                combinedAvatar.style.opacity = '0';
+                combinedAvatar.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    combinedAvatar.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                    combinedAvatar.style.opacity = '1';
+                    combinedAvatar.style.transform = 'scale(1)';
+                }, 50);
+            };
+            
+            frameImage.src = frameImageUrl;
+        }
+        
+        // 下载头像
+        downloadBtn.addEventListener('click', () => {
+            // 创建下载链接
+            const link = document.createElement('a');
+            link.download = 'avatar_with_frame.png';
+            link.href = combinedAvatar.toDataURL('image/png');
+            
+            // 触发下载
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            // 添加下载反馈动画
+            downloadBtn.classList.add('bg-green-700');
+            setTimeout(() => {
+                downloadBtn.classList.remove('bg-green-700');
+            }, 500);
+        });
+    </script>
+</body>
+</html>
