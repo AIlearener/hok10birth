@@ -33,42 +33,53 @@
             .avatar-shadow {
                 box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
             }
-            .transition-transform-opacity {
-                transition-property: transform, opacity;
+            .card-hover {
+                transition: all 0.3s ease;
+            }
+            .card-hover:hover {
+                transform: translateY(-5px);
             }
         }
     </style>
 </head>
 <body class="bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen font-inter text-neutral">
-    <div class="container mx-auto px-4 py-8 max-w-4xl">
+    <div class="container mx-auto px-4 py-6 sm:py-8 max-w-5xl">
         <!-- 页面标题 -->
-        <header class="text-center mb-12">
-            <h1 class="text-[clamp(2rem,5vw,3rem)] font-bold text-neutral mb-3 tracking-tight">
+        <header class="text-center mb-8 sm:mb-10">
+            <h1 class="text-[clamp(1.8rem,5vw,2.5rem)] font-bold text-neutral mb-2 tracking-tight">
                 王者十周年头像框合成
             </h1>
-            <p class="text-gray-600 max-w-2xl mx-auto">
-                上传您的个人头像，系统将自动与提供的头像框合成，生成带框的王者十周年头像
+            <p class="text-gray-600 max-w-2xl mx-auto text-sm sm:text-base">
+                上传您的个人头像，系统将自动生成带框的王者十周年头像
             </p>
         </header>
+
+        <!-- 示例图片 -->
+        <div class="text-center mb-6 sm:mb-8 px-2">
+            <img src="https://p11-flow-imagex-download-sign.byteimg.com/tos-cn-i-a9rns2rl98/4653fa8cc0494c99ad593f740a86231c.png~tplv-a9rns2rl98-24:720:720.png?rcl=20250925134546CD6233886DC301560F39&rk3s=8e244e95&rrcfp=8a172a1a&x-expires=1759383946&x-signature=Me4glKPibQQu4noirVR1ZZUCzyk%3D" 
+                 alt="小王十周年头像框" 
+                 class="mx-auto max-w-full max-h-48 sm:max-h-64 rounded-xl shadow-md object-contain"
+                 style="transition: all 0.3s ease;">
+        </div>
         
         <!-- 主要内容区 -->
-        <main class="grid md:grid-cols-2 gap-8 items-center">
+        <main class="grid md:grid-cols-2 gap-6 sm:gap-8">
             <!-- 左侧：上传区域 -->
-            <div class="bg-white rounded-2xl p-6 shadow-lg transform transition-all duration-300 hover:shadow-xl">
-                <h2 class="text-xl font-semibold mb-4 flex items-center">
+            <div class="bg-white rounded-xl p-5 sm:p-6 shadow-md card-hover">
+                <h2 class="text-lg sm:text-xl font-semibold mb-4 flex items-center">
                     <i class="fa fa-upload text-primary mr-2"></i>上传您的头像
                 </h2>
                 
                 <!-- 上传区域 -->
-                <div id="upload-area" class="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center cursor-pointer transition-all duration-300 hover:border-primary hover:bg-blue-50">
+                <div id="upload-area" class="border-2 border-dashed border-gray-300 rounded-xl p-6 sm:p-8 text-center cursor-pointer transition-all duration-300 hover:border-primary hover:bg-blue-50">
                     <input type="file" id="avatar-upload" accept="image/*" class="hidden">
-                    <i class="fa fa-user-circle-o text-5xl text-gray-400 mb-3"></i>
+                    <i class="fa fa-user-circle-o text-4xl sm:text-5xl text-gray-400 mb-3"></i>
                     <p class="text-gray-600 mb-2">点击或拖拽图片到此处上传</p>
-                    <p class="text-gray-400 text-sm">支持JPG、PNG等格式</p>
+                    <p class="text-gray-400 text-xs sm:text-sm">支持JPG、PNG等格式</p>
                 </div>
                 
                 <!-- 预览上传的头像 -->
-                <div id="preview-container" class="mt-6 hidden">
+                <div id="preview-container" class="mt-5 hidden">
                     <h3 class="text-sm font-medium text-gray-700 mb-2">您的原始头像：</h3>
                     <div class="relative rounded-xl overflow-hidden avatar-shadow">
                         <img id="original-avatar" class="w-full h-auto object-cover" alt="用户上传的原始头像">
@@ -79,7 +90,7 @@
                 </div>
                 
                 <!-- 操作按钮 -->
-                <div class="mt-6 flex justify-center">
+                <div class="mt-5 flex justify-center">
                     <button id="combine-btn" class="bg-primary hover:bg-primary/90 text-white font-medium py-2 px-6 rounded-lg shadow transition-all duration-300 flex items-center opacity-50 cursor-not-allowed" disabled>
                         <i class="fa fa-magic mr-2"></i>合成头像
                     </button>
@@ -87,16 +98,16 @@
             </div>
             
             <!-- 右侧：结果展示 -->
-            <div class="bg-white rounded-2xl p-6 shadow-lg transform transition-all duration-300 hover:shadow-xl">
-                <h2 class="text-xl font-semibold mb-4 flex items-center">
+            <div class="bg-white rounded-xl p-5 sm:p-6 shadow-md card-hover">
+                <h2 class="text-lg sm:text-xl font-semibold mb-4 flex items-center">
                     <i class="fa fa-image text-secondary mr-2"></i>合成结果
                 </h2>
                 
                 <!-- 结果预览区 -->
                 <div id="result-container" class="relative rounded-xl overflow-hidden bg-gray-100 avatar-shadow aspect-square flex items-center justify-center">
-                    <div id="empty-result" class="text-center p-8">
-                        <i class="fa fa-picture-o text-5xl text-gray-300 mb-3"></i>
-                        <p class="text-gray-500">上传头像并点击合成按钮查看结果</p>
+                    <div id="empty-result" class="text-center p-6">
+                        <i class="fa fa-picture-o text-4xl sm:text-5xl text-gray-300 mb-3"></i>
+                        <p class="text-gray-500 text-sm">上传头像并点击合成按钮查看结果</p>
                     </div>
                     
                     <!-- 合成后的图像将显示在这里 -->
@@ -104,7 +115,7 @@
                 </div>
                 
                 <!-- 下载按钮 -->
-                <div id="download-section" class="mt-6 flex justify-center hidden">
+                <div id="download-section" class="mt-5 flex justify-center hidden">
                     <button id="download-btn" class="bg-secondary hover:bg-secondary/90 text-white font-medium py-2 px-6 rounded-lg shadow transition-all duration-300 flex items-center">
                         <i class="fa fa-download mr-2"></i>下载头像
                     </button>
@@ -113,11 +124,11 @@
         </main>
         
         <!-- 说明区域 -->
-        <section class="mt-12 bg-white rounded-2xl p-6 shadow-md">
-            <h3 class="text-lg font-semibold mb-3 flex items-center">
+        <section class="mt-8 bg-white rounded-xl p-5 sm:p-6 shadow-sm">
+            <h3 class="text-base sm:text-lg font-semibold mb-3 flex items-center">
                 <i class="fa fa-info-circle text-primary mr-2"></i>使用说明
             </h3>
-            <ul class="list-disc pl-5 text-gray-600 space-y-2">
+            <ul class="list-disc pl-5 text-gray-600 text-sm space-y-1.5">
                 <li>上传正方形头像可获得最佳效果</li>
                 <li>系统会自动将头像框覆盖在您的头像上</li>
                 <li>合成完成后，您可以下载最终的头像图片</li>
@@ -126,7 +137,7 @@
         </section>
         
         <!-- 页脚 -->
-        <footer class="mt-12 text-center text-gray-500 text-sm">
+        <footer class="mt-8 text-center text-gray-500 text-xs sm:text-sm py-4">
             <p>王者十周年头像合成工具 &copy; 2025</p>
         </footer>
     </div>
